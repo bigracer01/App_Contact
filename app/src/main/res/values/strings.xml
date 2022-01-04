@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">App Contact</string>
+    <string name="item_default_name">Nom du contact</string>
+    <string name="item_default_number">Numéro de téléphone</string>
 </resources>
