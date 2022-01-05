@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static LinearLayout.LayoutParams getLayoutParam(){
-        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, displayMetrics.heightPixels/7);
+        return new LinearLayout.LayoutParams(displayMetrics.widthPixels / 4, displayMetrics.heightPixels/7);
     }
 
 
