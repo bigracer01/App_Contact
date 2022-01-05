@@ -20,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name=".provider.ItemContentProvider"
+            android:authorities="com.example.appcontact.provider"
+            android:enabled="true"
+            android:exported="true"
+            />
     </application>
 
 </manifest>

@@ -10,17 +10,22 @@ import android.provider.ContactsContract;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.appcontact.provider.ItemContentProvider;
+
 import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
-    private BDContact contactdb;
+    public static BDContact contactdb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         contactdb = new BDContact(this);
+
         readcontact();
+
+        System.out.println(ItemContentProvider.URI_ITEM);
     }
 
     @SuppressLint("Range")

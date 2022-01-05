@@ -37,6 +37,7 @@ public class BDContact {
         values.put(ContactSQLite.COLUMN_CONTACT_NAME,phonecontact.get_name());
         values.put(ContactSQLite.COLUMN_CONTACT_NUMBER,phonecontact.get_number());
         long id = bdd.insert(ContactSQLite.TABLE_CONTACT,null,values);
+        close();
         return id;
     }
 
