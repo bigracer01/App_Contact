@@ -36,6 +36,8 @@ public class ContactAdaptater extends ArrayAdapter<Phonecontact> {
         viewName.setText(_phonecontact.get(position).get_name());
         TextView viewNumber = (TextView) convertView.findViewById(R.id.number);
         viewNumber.setText(_phonecontact.get(position).get_number());
+        ImageView viewImage = (ImageView) convertView.findViewById(R.id.photo);
+        viewImage.setImageBitmap(_phonecontact.get(position).get_photo_uri());
 
 
         return convertView;
