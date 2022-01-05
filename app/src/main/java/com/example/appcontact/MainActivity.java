@@ -11,6 +11,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,6 +26,8 @@ import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
     public static BDContact contactdb;
+    public static DisplayMetrics displayMetrics = new DisplayMetrics();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         System.out.println(ItemContentProvider.URI_ITEM);
     }
@@ -76,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
         }
         ContactAdaptater adaptater = new ContactAdaptater(getApplicationContext(), R.layout.item, phonecontacts);
         listView.setAdapter(adaptater);
+    }
+
+    public static LinearLayout.LayoutParams getLayoutParam(){
+        return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, displayMetrics.heightPixels/7);
     }
 
 

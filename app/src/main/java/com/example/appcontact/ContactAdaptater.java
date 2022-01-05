@@ -1,6 +1,7 @@
 package com.example.appcontact;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,6 @@ public class ContactAdaptater extends ArrayAdapter<Phonecontact> {
             convertView = (LinearLayout) convertView;
         }
 
-
         TextView viewName = (TextView) convertView.findViewById(R.id.Name);
         viewName.setText(_phonecontact.get(position).get_name());
         TextView viewNumber = (TextView) convertView.findViewById(R.id.number);
@@ -39,6 +39,7 @@ public class ContactAdaptater extends ArrayAdapter<Phonecontact> {
         ImageView viewImage = (ImageView) convertView.findViewById(R.id.photo);
         viewImage.setImageBitmap(_phonecontact.get(position).get_photo_uri());
 
+        viewImage.setLayoutParams(MainActivity.getLayoutParam());
 
         return convertView;
     }
