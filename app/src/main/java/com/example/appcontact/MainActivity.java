@@ -1,14 +1,18 @@
 package com.example.appcontact;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
@@ -21,13 +25,23 @@ import android.widget.Toast;
 
 import com.example.appcontact.provider.ItemContentProvider;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
     public static BDContact contactdb;
     public static DisplayMetrics displayMetrics = new DisplayMetrics();
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,8 +49,34 @@ public class MainActivity extends AppCompatActivity {
 
         contactdb = new BDContact(this);
 
+        String fileName = "MyFile";
+        String content = "hello world";
+
+        FileOutputStream outputStream = null;
+
         try {
-            readcontact();
+            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+            readcontact(outputStream);
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File file = new File(this.getFilesDir(), fileName);
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            DataInputStream in = new DataInputStream(fis);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                System.out.println(strLine);
+            }
+            br.close();
+            in.close();
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("Range")
-    public void readcontact() throws IOException {
+    public void readcontact(FileOutputStream writer) throws IOException {
 
         Bitmap bp = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_image);
         ContentResolver contentResolver  = this.getContentResolver();
@@ -78,6 +118,9 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     contact1.set_photo_uri(MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(image_uri)));
                 }
+                writer.write(contact1.get_name().getBytes());
+                writer.write("\n".getBytes());
+                writer.write(contact1.get_number().getBytes());
                 contactdb.insertContact(contact1);
                 System.out.println(contactdb.getBdd());
                 System.out.println(c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Photo.PHOTO_URI)));
