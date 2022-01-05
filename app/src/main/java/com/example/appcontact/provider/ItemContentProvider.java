@@ -23,7 +23,7 @@ public class ItemContentProvider extends ContentProvider {
     public static final String TABLE_NAME = TABLE_CONTACT;
     public static final Uri URI_ITEM = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
 
-    private ContentResolver contentResolver;
+    private ContentResolver contentResolver ;
 
     
     @Override
@@ -34,6 +34,7 @@ public class ItemContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+
         Cursor c = null;
         if (getContext() != null){
             c = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,

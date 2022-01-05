@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public static BDContact contactdb;
     public static DisplayMetrics displayMetrics = new DisplayMetrics();
 
+    @SuppressLint("WrongConstant")
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,34 +50,17 @@ public class MainActivity extends AppCompatActivity {
 
         contactdb = new BDContact(this);
 
-        String fileName = "MyFile";
-        String content = "hello world";
-
-        FileOutputStream outputStream = null;
-
+        String text1 = "BONJOUR";
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(path, "test.txt");
         try {
-            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
-            readcontact(outputStream);
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            FileOutputStream fos = new FileOutputStream(file);
+            //fos.write(text1.getBytes());
+            readcontact(fos);
+            fos.close();
 
-        File file = new File(this.getFilesDir(), fileName);
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            DataInputStream in = new DataInputStream(fis);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                System.out.println(strLine);
-            }
-            br.close();
-            in.close();
-            fis.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Toast.makeText(MainActivity.this, "File Saved", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,6 +116,22 @@ public class MainActivity extends AppCompatActivity {
 
     public static LinearLayout.LayoutParams getLayoutParam(){
         return new LinearLayout.LayoutParams(displayMetrics.widthPixels / 4, displayMetrics.heightPixels/7);
+    }
+
+    public void writedocument(){
+        String text1 = "BONJOUR";
+        File path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(path, "test.txt");
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(text1.getBytes());
+            fos.close();
+
+            Toast.makeText(MainActivity.this, "File Saved", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
