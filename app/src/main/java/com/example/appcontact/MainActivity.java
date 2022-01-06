@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,11 +17,14 @@ import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.appcontact.provider.ItemContentProvider;
@@ -40,6 +44,9 @@ import java.util.Scanner;
 public class MainActivity extends AppCompatActivity {
     public static BDContact contactdb;
     public static DisplayMetrics displayMetrics = new DisplayMetrics();
+    public static final String EXTRA_NAME = "1";
+    public static final String EXTRA_NUMBER = "2";
+
 
     @SuppressLint("WrongConstant")
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -112,6 +119,25 @@ public class MainActivity extends AppCompatActivity {
         }
         ContactAdaptater adaptater = new ContactAdaptater(getApplicationContext(), R.layout.item, phonecontacts);
         listView.setAdapter(adaptater);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(getApplicationContext(), ActivityContact2.class);
+
+                String contactname = phonecontacts.get(position).get_name();
+
+                String contactphone = phonecontacts.get(position).get_number();
+                System.out.println(contactname);
+                System.out.println(contactphone);
+
+                intent.putExtra(EXTRA_NAME,contactname);
+                intent.putExtra(EXTRA_NUMBER, contactphone);
+
+                startActivity(intent);
+            }
+        });
     }
 
     public static LinearLayout.LayoutParams getLayoutParam(){
