@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class BDContact {
     private final static int VERSION_BDD = 1;
-    private SQLiteDatabase bdd;
+    private static SQLiteDatabase bdd;
     private ContactSQLite maBaseSQLite;
     public int id = 0;
 
@@ -26,7 +26,7 @@ public class BDContact {
         maBaseSQLite.close();
     }
 
-    public SQLiteDatabase getBdd(){
+    public static SQLiteDatabase getBdd(){
         return bdd;
     }
 

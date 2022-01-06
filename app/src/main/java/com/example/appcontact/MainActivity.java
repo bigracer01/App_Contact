@@ -1,11 +1,13 @@
 package com.example.appcontact;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,36 +18,35 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.appcontact.provider.ItemContentProvider;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static BDContact contactdb;
     public static DisplayMetrics displayMetrics = new DisplayMetrics();
     public static final String EXTRA_NAME = "1";
     public static final String EXTRA_NUMBER = "2";
+    private FileOutputStream fos;
 
 
     @SuppressLint("WrongConstant")
@@ -57,13 +58,16 @@ public class MainActivity extends AppCompatActivity {
 
         contactdb = new BDContact(this);
 
+
+
         String text1 = "BONJOUR";
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS);
         File file = new File(path, "test.txt");
         try {
-            FileOutputStream fos = new FileOutputStream(file);
+            fos = new FileOutputStream(file);
             //fos.write(text1.getBytes());
+            requestPermissions();
             readcontact(fos);
             fos.close();
 
@@ -82,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
 
+        try {
+            readcontact(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @SuppressLint("Range")
@@ -99,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         if (c == null){
             Toast.makeText(MainActivity.this, "Il n'y a pas de contact enregistré", Toast.LENGTH_SHORT).show();
         }else{
+            writer.write("{".getBytes());
             while(c.moveToNext()){
                 Phonecontact contact1 =  new Phonecontact(c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_ALTERNATIVE)),
                         c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
@@ -109,13 +120,16 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     contact1.set_photo_uri(MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(image_uri)));
                 }
+                writer.write("{\"name\": \"".getBytes());
                 writer.write(contact1.get_name().getBytes());
-                writer.write("\n".getBytes());
+                writer.write("\",\"number\" : \"".getBytes());
                 writer.write(contact1.get_number().getBytes());
+                writer.write("\"},".getBytes());
                 contactdb.insertContact(contact1);
                 System.out.println(contactdb.getBdd());
                 System.out.println(c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Photo.PHOTO_URI)));
             }
+            writer.write("}".getBytes());
         }
         ContactAdaptater adaptater = new ContactAdaptater(getApplicationContext(), R.layout.item, phonecontacts);
         listView.setAdapter(adaptater);
@@ -124,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intent = new Intent(getApplicationContext(), ActivityContact2.class);
+                Intent intent = new Intent(getApplicationContext(), ContactDetailsActivity.class);
 
                 String contactname = phonecontacts.get(position).get_name();
 
@@ -160,6 +174,93 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private void requestPermissions() {
+        // below line is use to request
+        // permission in the current activity.
+        Dexter.withActivity(this)
+                // below line is use to request the number of
+                // permissions which are required in our app.
+                .withPermissions(Manifest.permission.READ_CONTACTS,
+                        // below is the list of permissions
+                        Manifest.permission.CALL_PHONE,
+                        Manifest.permission.SEND_SMS, Manifest.permission.WRITE_CONTACTS)
+                // after adding permissions we are
+                // calling an with listener method.
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+                        // this method is called when all permissions are granted
+                        if (multiplePermissionsReport.areAllPermissionsGranted()) {
+                            // do you work now
+                            Toast.makeText(MainActivity.this, "All the permissions are granted..", Toast.LENGTH_SHORT).show();
+                        }
+                        // check for permanent denial of any permission
+                        if (multiplePermissionsReport.isAnyPermissionPermanentlyDenied()) {
+                            // permission is denied permanently,
+                            // we will show user a dialog message.
+                            showSettingsDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+                        // this method is called when user grants some
+                        // permission and denies some of them.
+                        permissionToken.continuePermissionRequest();
+                    }
+                }).withErrorListener(new PermissionRequestErrorListener() {
+            // this method is use to handle error
+            // in runtime permissions
+            @Override
+            public void onError(DexterError error) {
+                // we are displaying a toast message for error message.
+                Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+            }
+        })
+                // below line is use to run the permissions
+                // on same thread and to check the permissions
+                .onSameThread().check();
+    }
+
+    private void showSettingsDialog() {
+        // we are displaying an alert dialog for permissions
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        // below line is the title
+        // for our alert dialog.
+        builder.setTitle("Need Permissions");
+
+        // below line is our message for our dialog
+        builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
+        builder.setPositiveButton("GOTO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // this method is called on click on positive
+                // button and on clicking shit button we
+                // are redirecting our user from our app to the
+                // settings page of our app.
+                dialog.cancel();
+                // below is the intent from which we
+                // are redirecting our user.
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivityForResult(intent, 101);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // this method is called when
+                // user click on negative button.
+                dialog.cancel();
+            }
+        });
+        // below line is used
+        // to display our dialog
+        builder.show();
+    }
 
 
 }

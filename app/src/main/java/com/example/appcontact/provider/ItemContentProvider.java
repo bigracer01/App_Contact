@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.appcontact.BDContact;
+import com.example.appcontact.ContactSQLite;
 import com.example.appcontact.MainActivity;
 
 import java.time.DayOfWeek;
@@ -37,8 +38,7 @@ public class ItemContentProvider extends ContentProvider {
 
         Cursor c = null;
         if (getContext() != null){
-            c = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_ALTERNATIVE, ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null);
+            c = BDContact.getBdd().query(TABLE_CONTACT, new String[]{ContactSQLite.COLUMN_CONTACT_NAME, ContactSQLite.COLUMN_CONTACT_NUMBER}, null, null, null, null, null);
         }
         return  c;
     }
@@ -46,7 +46,7 @@ public class ItemContentProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        return "type";
     }
 
     @Nullable
