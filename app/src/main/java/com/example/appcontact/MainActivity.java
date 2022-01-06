@@ -58,15 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
         contactdb = new BDContact(this);
 
-
-
-        String text1 = "BONJOUR";
         File path = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS);
         File file = new File(path, "test.txt");
         try {
             fos = new FileOutputStream(file);
-            //fos.write(text1.getBytes());
             requestPermissions();
             readcontact(fos);
             fos.close();
@@ -75,10 +71,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
         System.out.println(ItemContentProvider.URI_ITEM);
     }
 
@@ -139,16 +132,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Intent intent = new Intent(getApplicationContext(), ContactDetailsActivity.class);
-
                 String contactname = phonecontacts.get(position).get_name();
-
                 String contactphone = phonecontacts.get(position).get_number();
-                System.out.println(contactname);
-                System.out.println(contactphone);
-
                 intent.putExtra(EXTRA_NAME,contactname);
                 intent.putExtra(EXTRA_NUMBER, contactphone);
-
                 startActivity(intent);
             }
         });
@@ -158,21 +145,6 @@ public class MainActivity extends AppCompatActivity {
         return new LinearLayout.LayoutParams(displayMetrics.widthPixels / 4, displayMetrics.heightPixels/7);
     }
 
-    public void writedocument(){
-        String text1 = "BONJOUR";
-        File path = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(path, "test.txt");
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(text1.getBytes());
-            fos.close();
-
-            Toast.makeText(MainActivity.this, "File Saved", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     private void requestPermissions() {
